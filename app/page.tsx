@@ -1,65 +1,105 @@
-import Image from "next/image";
+import { GlobalHeader } from "./components/GlobalHeader";
+import { CreatePlanDialog } from "./components/CreatePlanDialog";
+import { PlanCard } from "./components/PlanCard";
+import { LayersIcon, TargetIcon, ClockIcon } from "./components/icons";
+import { plans } from "./lib/data";
 
-export default function Home() {
+const stats = [
+  { label: "Active Plans", value: "3", Icon: LayersIcon, tint: "text-action bg-action-50" },
+  { label: "Degree Progress", value: "73%", Icon: TargetIcon, tint: "text-emerald bg-emerald-50" },
+  { label: "Terms to Grad", value: "4", Icon: ClockIcon, tint: "text-navy bg-navy-50" },
+];
+
+export default function DashboardPage() {
+  const primary = plans.filter((p) => p.isPrimary);
+  const secondary = plans.filter((p) => !p.isPrimary);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex min-h-full flex-col">
+      <GlobalHeader />
+
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        {/* Page header */}
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="animate-rise">
+            <span className="label-caps text-action">Academic Plans</span>
+            <h1 className="mt-1.5 text-3xl font-bold tracking-tight text-navy sm:text-[2.25rem]">
+              Welcome back, Nigel
+            </h1>
+            <p className="mt-2 max-w-xl text-[0.95rem] text-muted">
+              Review your declared major plan, compare alternate paths at
+              BYU-Idaho, and keep every requirement on track for graduation.
+            </p>
+          </div>
+          <div className="animate-rise" style={{ animationDelay: "60ms" }}>
+            <CreatePlanDialog />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Quick stats */}
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {stats.map(({ label, value, Icon, tint }, i) => (
+            <div
+              key={label}
+              className="animate-rise flex items-center gap-4 rounded-card border border-line bg-surface p-5 shadow-card"
+              style={{ animationDelay: `${100 + i * 60}ms` }}
+            >
+              <span className={`grid size-12 place-items-center rounded-card ${tint}`}>
+                <Icon width={22} height={22} />
+              </span>
+              <div>
+                <div className="text-2xl font-bold tracking-tight text-navy tabular-nums">
+                  {value}
+                </div>
+                <div className="label-caps">{label}</div>
+              </div>
+            </div>
+          ))}
         </div>
+
+        {/* Primary (declared) plan */}
+        <section className="mt-10" aria-labelledby="declared-heading">
+          <h2 id="declared-heading" className="sr-only">
+            Declared plan
+          </h2>
+          <div className="animate-rise" style={{ animationDelay: "180ms" }}>
+            {primary.map((plan) => (
+              <PlanCard key={plan.id} plan={plan} />
+            ))}
+          </div>
+        </section>
+
+        {/* Secondary plans */}
+        <section className="mt-10" aria-labelledby="other-heading">
+          <div className="flex items-center justify-between">
+            <h2
+              id="other-heading"
+              className="text-lg font-semibold tracking-tight text-navy"
+            >
+              Other plans &amp; drafts
+            </h2>
+            <span className="label-caps">{secondary.length} plans</span>
+          </div>
+          <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {secondary.map((plan, i) => (
+              <div
+                key={plan.id}
+                className="animate-rise"
+                style={{ animationDelay: `${220 + i * 70}ms` }}
+              >
+                <PlanCard plan={plan} />
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
+
+      <footer className="border-t border-line bg-surface">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-muted sm:flex-row sm:px-6 lg:px-8">
+          <p>© {new Date().getFullYear()} Grad Plan · BYU-Idaho</p>
+          <p>Registration &amp; Academic Services · Rexburg, Idaho</p>
+        </div>
+      </footer>
     </div>
   );
 }
